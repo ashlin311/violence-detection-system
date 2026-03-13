@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Violence Detection System</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="app-shell">
+
+  <nav class="navbar">
+    <div class="navbar-logo" aria-label="AI brand mark">&#9673;</div>
+
+    <div class="navbar-links">
+      <a class="nav-link" onclick="openOverlay('overview')">Overview</a>
+      <a class="nav-link" onclick="openOverlay('features')">Features</a>
+      <a class="nav-link" onclick="openOverlay('about')">About</a>
+    </div>
+
+    <button class="button button--ghost navbar-signin" type="button">Sign In</button>
+  </nav>
+
+  <main class="hero">
+    <h1 class="hero-title">AI VIOLENCE DETECTION SYSTEM</h1>
+    <p class="hero-subtitle">Real-time AI monitoring for safer spaces</p>
+
+    <div class="hero-cards">
+      <section class="dashboard-card">
+        <h3 class="card-title">Upload Evidence</h3>
+
+        <div class="upload-panel">
+          <p class="upload-panel-text">Drag and drop a video to analyze</p>
+          <button class="button button--primary" type="button" onclick="openUpload()">Upload Video</button>
+        </div>
+      </section>
+
+      <section class="dashboard-card">
+        <h3 class="card-title">Live Camera Monitor</h3>
+        <div class="camera-preview"></div>
+        <p class="camera-detection">Violence Detection: 0%</p>
+        <button class="button button--primary" type="button" onclick="openCamera()">Start Camera Scan</button>
+      </section>
+    </div>
+
+    <div class="status-banner">
+      <span class="status-banner-label">AI STATUS:</span>
+      <span class="status-banner-value">SCANNING FOR VIOLENCE</span>
+    </div>
+  </main>
+
+  <section class="overlay" id="overview">
+    <div class="modal-card">
+      <h2 class="modal-title">Overview</h2>
+      <p class="modal-text">
+        This system uses AI to analyze video footage and detect violent activities in real time.
+      </p>
+      <button class="button button--primary modal-close" type="button" onclick="closeOverlay()">Close</button>
+    </div>
+  </section>
+
+  <section class="overlay" id="features">
+    <div class="modal-card">
+      <h2 class="modal-title">Features</h2>
+
+      <ul class="feature-list">
+        <li class="feature-list-item">AI Violence Detection</li>
+        <li class="feature-list-item">Human Activity Analysis</li>
+        <li class="feature-list-item">Real Time Video Processing</li>
+        <li class="feature-list-item">Frame Highlighting</li>
+      </ul>
+
+      <button class="button button--primary modal-close" type="button" onclick="closeOverlay()">Close</button>
+    </div>
+  </section>
+
+  <section class="overlay" id="about">
+    <div class="modal-card">
+      <h2 class="modal-title">About</h2>
+      <p class="modal-text">
+        Group project demonstrating deep learning based violence detection using computer vision.
+      </p>
+      <button class="button button--primary modal-close" type="button" onclick="closeOverlay()">Close</button>
+    </div>
+  </section>
+
+  <section class="overlay" id="analysis">
+    <div class="modal-card">
+      <div id="loading" class="analysis-loading">
+        <h2 class="modal-title">Analyzing Video...</h2>
+        <div class="loader"></div>
+      </div>
+
+      <div id="result" class="analysis-result is-hidden">
+        <h2 class="modal-title">Analysis Result</h2>
+        <p class="analysis-text" id="prediction"></p>
+        <p class="analysis-text" id="confidence"></p>
+        <p class="analysis-text" id="people"></p>
+
+        <img class="analysis-frame" id="frame" alt="Most active frame from the upload">
+
+        <button class="button button--primary modal-close" type="button" onclick="closeOverlay()">Close</button>
+      </div>
+    </div>
+  </section>
+
+  <script src="app.js"></script>
+
+</body>
+</html>
