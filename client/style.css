@@ -30,6 +30,7 @@
     url("assets/background.png");
 
   background-position: center;
+  background-attachment: fixed;  
   background-repeat: no-repeat;
   background-size: cover;
 }
@@ -38,7 +39,7 @@
   content:"";
 
   position:fixed;
-  top:100%;
+  top:90%;
   left:10%;
 
   /* SIZE (adjust here) */
@@ -75,6 +76,45 @@
   }
 }
 
+.app-shell::after{
+  content:"";
+
+  position:fixed;
+
+  /* POSITION */
+  top:0%;
+  right:32%;
+
+  /* SIZE */
+  width:550px;
+  height:500px;
+
+  /* IMAGE */
+  background-image:url("assets/design.png");
+  background-size:contain;
+  background-repeat:no-repeat;
+  background-position:center;
+
+  /* OPACITY */
+  opacity:0.40;
+
+  /* ROTATION */
+  animation:rotateDesignReverse 120s linear infinite;
+
+  /* LAYER */
+  z-index:0;
+  pointer-events:none;
+}
+
+@keyframes rotateDesignReverse{
+  0%{
+    transform:rotate(0deg);
+  }
+
+  100%{
+    transform:rotate(360deg);
+  }
+}
 .navbar,
 .hero,
 .hero-cards,
@@ -186,7 +226,8 @@
 }
 
 .dashboard-card {
-  width: 380px;
+  width: 520px;
+  height: 350px;
   border: 1px solid var(--accent-soft);
   border-radius: var(--border-radius);
   background-color: var(--bg-card);
