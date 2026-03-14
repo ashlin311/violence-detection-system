@@ -9,7 +9,8 @@ from masking import apply_human_mask
 class TSNModel(nn.Module):
     def __init__(self, num_classes=2, pretrained=False):
         super().__init__()
-        self.backbone = models.resnet18(pretrained=pretrained)
+        weights = models.ResNet18_Weights.DEFAULT if pretrained else None
+        self.backbone = models.resnet18(weights=weights)
         in_features = self.backbone.fc.in_features
         self.backbone.fc = nn.Linear(in_features, num_classes)
 
@@ -42,8 +43,13 @@ val_transform = transforms.Compose([
 
 def run_inference(video_path):
     total_frames = get_total_frames(video_path)
+    if total_frames <= 0:
+        raise ValueError("Uploaded video has no readable frames")
+
     indices = get_tsn_indices(total_frames, num_segments=8, mode="val")
     frames = extract_tsn_frames(video_path, indices)
+    if not frames:
+        raise ValueError("No frames could be extracted from uploaded video")
 
     tensors = []
     masked_frames = []
