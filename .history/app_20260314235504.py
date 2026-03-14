@@ -72,8 +72,11 @@ def predict():
             "masked_frame": encode_image_to_base64(result["masked_frame"]),
             "gradcam_frame": None,
         }
-        gradcam_b64 = generate_gradcam(model,result["masked_frame"],device,target_class=1)
-        response["gradcam_frame"] = gradcam_b64
+
+        # Generate Grad-CAM heatmap for the most active frame
+        if result["most_active_frame"] is not None:
+            gradcam_frame = generate_gradcam(model, device, result["original_frame"], result["most_active_frame"])
+            response["gradcam_frame"] = encode_image_to_base64(gradcam_frame)
 
         return jsonify(response)
 

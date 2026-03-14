@@ -7,9 +7,9 @@ import traceback
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 
-from model import run_inference,model, device
+from model import run_inference
 from utils import encode_image_to_base64
-from gradcam import generate_gradcam
+from gr
 
 app = Flask(__name__)
 CORS(app)
@@ -72,9 +72,6 @@ def predict():
             "masked_frame": encode_image_to_base64(result["masked_frame"]),
             "gradcam_frame": None,
         }
-        gradcam_b64 = generate_gradcam(model,result["masked_frame"],device,target_class=1)
-        response["gradcam_frame"] = gradcam_b64
-
         return jsonify(response)
 
     except (ValueError, RuntimeError) as e:

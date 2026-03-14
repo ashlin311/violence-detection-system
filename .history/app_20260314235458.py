@@ -72,9 +72,8 @@ def predict():
             "masked_frame": encode_image_to_base64(result["masked_frame"]),
             "gradcam_frame": None,
         }
-        gradcam_b64 = generate_gradcam(model,result["masked_frame"],device,target_class=1)
-        response["gradcam_frame"] = gradcam_b64
 
+        
         return jsonify(response)
 
     except (ValueError, RuntimeError) as e:

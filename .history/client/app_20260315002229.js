@@ -70,16 +70,6 @@ function showResult(data) {
   } else {
     elements.gradcamFrameImage.removeAttribute("src");
   }
-
-  // Add click listeners to analysis frame images
-  elements.mostActiveFrameImage.style.cursor = "pointer";
-  elements.mostActiveFrameImage.onclick = () => openFullscreenImage(elements.mostActiveFrameImage.src);
-
-  elements.maskedFrameImage.style.cursor = "pointer";
-  elements.maskedFrameImage.onclick = () => openFullscreenImage(elements.maskedFrameImage.src);
-
-  elements.gradcamFrameImage.style.cursor = "pointer";
-  elements.gradcamFrameImage.onclick = () => openFullscreenImage(elements.gradcamFrameImage.src);
 }
 
 function showAnalysisError(message) {
@@ -129,20 +119,6 @@ async function analyzeVideo(file) {
     showAnalysisError(err.message || "Backend connection error");
     return false;
   }
-}
-
-function openFullscreenImage(src) {
-  const overlay = document.getElementById("fullscreenImageOverlay");
-  const fullscreenImage = document.getElementById("fullscreenImage");
-  if (src && src !== "") {
-    fullscreenImage.src = src;
-    overlay.style.display = "flex";
-  }
-}
-
-function closeFullscreenImage() {
-  const overlay = document.getElementById("fullscreenImageOverlay");
-  overlay.style.display = "none";
 }
 
 function getCameraElements() {

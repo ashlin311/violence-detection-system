@@ -4,6 +4,7 @@ from torchvision import models, transforms
 
 from utils import get_total_frames, get_tsn_indices, extract_tsn_frames, frame_to_tensor, encode_image_to_base64
 from masking import apply_human_mask
+from gradcam import generate_gradcam
 
 class TSNModel(nn.Module):
     def __init__(self, num_classes=2, pretrained=False):

@@ -43,7 +43,6 @@ function getAnalysisElements() {
     mostActiveFrame: document.getElementById("mostActiveFrame"),
     mostActiveFrameImage: document.getElementById("mostActiveFrameImage"),
     maskedFrameImage: document.getElementById("maskedFrameImage"),
-    gradcamFrameImage: document.getElementById("gradcamImage"),
   };
 }
 
@@ -65,21 +64,7 @@ function showResult(data) {
   elements.mostActiveFrame.innerText = `Most Active Frame Index: ${data.most_active_frame}`;
   elements.mostActiveFrameImage.src = `data:image/jpeg;base64,${data.original_frame}`;
   elements.maskedFrameImage.src = `data:image/jpeg;base64,${data.masked_frame}`;
-  if (data.gradcam_frame) {
-    elements.gradcamFrameImage.src = `data:image/jpeg;base64,${data.gradcam_frame}`;
-  } else {
-    elements.gradcamFrameImage.removeAttribute("src");
-  }
-
-  // Add click listeners to analysis frame images
-  elements.mostActiveFrameImage.style.cursor = "pointer";
-  elements.mostActiveFrameImage.onclick = () => openFullscreenImage(elements.mostActiveFrameImage.src);
-
-  elements.maskedFrameImage.style.cursor = "pointer";
-  elements.maskedFrameImage.onclick = () => openFullscreenImage(elements.maskedFrameImage.src);
-
-  elements.gradcamFrameImage.style.cursor = "pointer";
-  elements.gradcamFrameImage.onclick = () => openFullscreenImage(elements.gradcamFrameImage.src);
+  elements.g
 }
 
 function showAnalysisError(message) {
@@ -93,7 +78,6 @@ function showAnalysisError(message) {
   elements.mostActiveFrame.innerText = "";
   elements.mostActiveFrameImage.removeAttribute("src");
   elements.maskedFrameImage.removeAttribute("src");
-  elements.gradcamFrameImage.removeAttribute("src");
 }
 
 async function analyzeVideo(file) {
@@ -129,20 +113,6 @@ async function analyzeVideo(file) {
     showAnalysisError(err.message || "Backend connection error");
     return false;
   }
-}
-
-function openFullscreenImage(src) {
-  const overlay = document.getElementById("fullscreenImageOverlay");
-  const fullscreenImage = document.getElementById("fullscreenImage");
-  if (src && src !== "") {
-    fullscreenImage.src = src;
-    overlay.style.display = "flex";
-  }
-}
-
-function closeFullscreenImage() {
-  const overlay = document.getElementById("fullscreenImageOverlay");
-  overlay.style.display = "none";
 }
 
 function getCameraElements() {

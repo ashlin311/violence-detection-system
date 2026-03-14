@@ -609,11 +609,6 @@
   object-fit: cover;
 }
 
-.analysis-frame:not([src]),
-.analysis-frame[src=""] {
-  display: none;
-}
-
 .is-hidden {
   display: none;
 }
@@ -695,56 +690,6 @@ animation:blink 1s infinite;
   }
 
   .analysis-frame-block:last-child {
-    grid-column: 1/ -1;
+    grid-column: 1;
   }
-}
-
-/* ============================= */
-/* FULLSCREEN IMAGE VIEW */
-/* ============================= */
-
-.fullscreen-image-overlay {
-  display: none;
-  justify-content: center;
-  align-items: center;
-  background-color: rgba(0, 0, 0, 0.95);
-  z-index: 1000;
-}
-
-.fullscreen-image-container {
-  position: relative;
-  width: 90vw;
-  height: 90vh;
-  max-width: 1200px;
-  max-height: 900px;
-}
-
-.fullscreen-image {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  border-radius: 8px;
-}
-
-.fullscreen-close {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  width: 48px;
-  height: 48px;
-  padding: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  border: none;
-  border-radius: 50%;
-  color: white;
-  font-size: 32px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background-color 0.2s;
-}
-
-.fullscreen-close:hover {
-  background-color: rgba(0, 0, 0, 0.8);
 }
