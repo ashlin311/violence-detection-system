@@ -51,12 +51,66 @@ def extract_tsn_frames(video_path, frame_indices):
     frames = []
 
     try:
-        for idx in frame_indices:
-            cap.set(cv2.CAP_PROP_POS_FRAMES, int(idx))
-            ret, frame = cap.read()
+        if not cap.isOpened():
+            raise RuntimeError("Could not open uploaded video")
+
+        total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+        if total_frames <= 0:
+            raise RuntimeError("Video has no decodable frames")
+
+        if not frame_indices:
+            return frames
+
+        clamped_indices = [
+            min(max(int(idx), 0), total_frames - 1)
+            for idx in frame_indices
+        ]
+        index_to_positions = {}
+        for pos, idx in enumerate(clamped_indices):
+            index_to_positions.setdefault(idx, []).append(pos)
+
+        sorted_targets = sorted(index_to_positions.keys())
+        resolved = [None] * len(clamped_indices)
+
+        target_ptr = 0
+        current_idx = -1
+        first_valid_frame = None
+        last_valid_frame = None
+        consecutive_failures = 0
+
+        # Sequential decode is more robust than random seeking for WebM/VP8/VP9.
+        while target_ptr < len(sorted_targets):
+            ret, candidate = cap.read()
             if not ret:
-                raise RuntimeError(f"Failed to read frame {idx}")
-            frames.append(frame)
+                consecutive_failures += 1
+                if consecutive_failures >= 5:
+                    break
+                continue
+
+            consecutive_failures = 0
+            current_idx += 1
+            if candidate is not None and candidate.size > 0:
+                if first_valid_frame is None:
+                    first_valid_frame = candidate.copy()
+                last_valid_frame = candidate
+
+            while target_ptr < len(sorted_targets) and sorted_targets[target_ptr] <= current_idx:
+                target_idx = sorted_targets[target_ptr]
+                fill_frame = last_valid_frame if last_valid_frame is not None else first_valid_frame
+                if fill_frame is not None:
+                    for out_pos in index_to_positions[target_idx]:
+                        resolved[out_pos] = fill_frame.copy()
+                target_ptr += 1
+
+        if first_valid_frame is None:
+            raise RuntimeError("Uploaded video could not be decoded")
+
+        fallback_frame = last_valid_frame if last_valid_frame is not None else first_valid_frame
+        for i, frame in enumerate(resolved):
+            if frame is None:
+                resolved[i] = fallback_frame.copy()
+
+        frames = resolved
     finally:
         cap.release()
 

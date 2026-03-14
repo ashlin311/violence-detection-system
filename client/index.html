@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body class="app-shell">
+  <div class="background-layer" aria-hidden="true"></div>
 
   <nav class="navbar">
     <div class="navbar-logo" aria-label="AI brand mark">&#9673;</div>
@@ -17,34 +18,37 @@
       <a class="nav-link" onclick="openOverlay('about')">About</a>
     </div>
 
-    <button class="button button--ghost navbar-signin" type="button">Sign In</button>
+    <button class="button button--ghost navbar-signin" type="button"></button>
   </nav>
 
   <main class="hero">
-    <h1 class="hero-title">AI VIOLENCE DETECTION SYSTEM</h1>
+    <h1 class="hero-title"> VIOLENCE DETECTION SYSTEM</h1>
     <p class="hero-subtitle">Real-time AI monitoring for safer spaces</p>
 
     <div class="hero-cards">
-      <section class="dashboard-card">
+      <section class="dashboard-card dashboard-card--upload">
         <h3 class="card-title">Upload Evidence</h3>
 
-        <div class="upload-panel">
-          <p class="upload-panel-text">Drag and drop a video to analyze</p>
-          <button class="button button--primary" type="button" onclick="openUpload()">Upload Video</button>
+        <div class="upload-panel upload-panel-box">
+          <p class="upload-panel-text upload-panel-label">Drag and drop a video to analyze</p>
+          <button class="button button--primary upload-action-button" type="button" onclick="openUpload()">Upload Video</button>
         </div>
       </section>
 
-      <section class="dashboard-card">
+      <section class="dashboard-card dashboard-card--camera">
         <h3 class="card-title">Live Camera Monitor</h3>
-        <div class="camera-preview"></div>
-        <p class="camera-detection">Violence Detection: 0%</p>
-        <button class="button button--primary" type="button" onclick="openCamera()">Start Camera Scan</button>
+        <div class="camera-preview camera-preview-box" id="cameraPreview">
+          <video class="camera-video is-hidden" id="cameraVideo" autoplay muted playsinline></video>
+          <div class="camera-overlay" id="cameraOverlay">Camera preview</div>
+        </div>
+        <p class="camera-detection camera-status-text" id="cameraStatus" data-idle-text="Press Start Camera Scan to record and analyze.">Press Start Camera Scan to record and analyze.</p>
+        <button class="button button--primary camera-start-button" id="cameraStartButton" type="button" onclick="openCamera()">Start Camera</button>
       </section>
     </div>
 
     <div class="status-banner">
-      <span class="status-banner-label">AI STATUS:</span>
-      <span class="status-banner-value">SCANNING FOR VIOLENCE</span>
+      
+    
     </div>
   </main>
 
