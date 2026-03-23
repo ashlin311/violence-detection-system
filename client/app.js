@@ -15,6 +15,7 @@ function openOverlay(id) {
 function closeOverlay() {
   document.querySelectorAll(".overlay").forEach((overlay) => {
     overlay.style.display = "none";
+    overlay.classList.remove("analysis-overlay--loading");
   });
 }
 
@@ -35,34 +36,54 @@ function openUpload() {
 
 function getAnalysisElements() {
   return {
+    overlay: document.getElementById("analysis"),
     loading: document.getElementById("loading"),
     result: document.getElementById("result"),
     prediction: document.getElementById("prediction"),
+    statusPill: document.getElementById("analysisStatusPill"),
     confidence: document.getElementById("confidence"),
     people: document.getElementById("people"),
     mostActiveFrame: document.getElementById("mostActiveFrame"),
+    frameIndexCard: document.getElementById("frameIndexCard"),
     mostActiveFrameImage: document.getElementById("mostActiveFrameImage"),
     maskedFrameImage: document.getElementById("maskedFrameImage"),
     gradcamFrameImage: document.getElementById("gradcamImage"),
+    gradcamSlider: document.getElementById("gradcamSlider"),
   };
 }
 
 function showAnalysisLoading() {
   const elements = getAnalysisElements();
   openOverlay("analysis");
+  elements.overlay.classList.add("analysis-overlay--loading");
   elements.loading.classList.remove("is-hidden");
   elements.result.classList.add("is-hidden");
 }
 
 function showResult(data) {
   const elements = getAnalysisElements();
+  elements.overlay.classList.remove("analysis-overlay--loading");
   elements.loading.classList.add("is-hidden");
   elements.result.classList.remove("is-hidden");
 
-  elements.prediction.innerText = `Prediction: ${data.prediction}`;
-  elements.confidence.innerText = `Confidence: ${(data.confidence * 100).toFixed(2)}%`;
-  elements.people.innerText = `Persons Detected: ${data.person_count}`;
-  elements.mostActiveFrame.innerText = `Most Active Frame Index: ${data.most_active_frame}`;
+  const confidenceRaw = Number(data.confidence);
+  const confidencePercent = Number.isFinite(confidenceRaw) ? confidenceRaw * 100 : 0;
+  const confidenceValue = confidencePercent.toFixed(2);
+  const predictionText = data.prediction || "Unknown";
+  const predictionLower = predictionText.toLowerCase();
+  elements.prediction.innerText = predictionText;
+  elements.confidence.innerText = `${confidenceValue}%`;
+  elements.people.innerText = String(data.person_count ?? 0);
+  elements.mostActiveFrame.innerText = String(data.most_active_frame ?? "-");
+  elements.frameIndexCard.innerText = String(data.most_active_frame ?? "-");
+  elements.gradcamSlider.value = Math.max(0, Math.min(100, Math.round(confidencePercent)));
+
+  elements.statusPill.classList.remove("analysis-status-pill--safe", "analysis-status-pill--alert");
+  if (predictionLower.includes("non")) {
+    elements.statusPill.classList.add("analysis-status-pill--safe");
+  } else if (predictionLower.includes("viol")) {
+    elements.statusPill.classList.add("analysis-status-pill--alert");
+  }
   elements.mostActiveFrameImage.src = `data:image/jpeg;base64,${data.original_frame}`;
   elements.maskedFrameImage.src = `data:image/jpeg;base64,${data.masked_frame}`;
   if (data.gradcam_frame) {
@@ -84,16 +105,22 @@ function showResult(data) {
 
 function showAnalysisError(message) {
   const elements = getAnalysisElements();
+  elements.overlay.classList.remove("analysis-overlay--loading");
   elements.loading.classList.add("is-hidden");
   elements.result.classList.remove("is-hidden");
 
-  elements.prediction.innerText = `Error: ${message}`;
-  elements.confidence.innerText = "";
-  elements.people.innerText = "";
-  elements.mostActiveFrame.innerText = "";
+  elements.prediction.innerText = "Error";
+  elements.statusPill.classList.remove("analysis-status-pill--safe");
+  elements.statusPill.classList.add("analysis-status-pill--alert");
+  elements.confidence.innerText = "--";
+  elements.people.innerText = "--";
+  elements.mostActiveFrame.innerText = "--";
+  elements.frameIndexCard.innerText = "--";
+  elements.gradcamSlider.value = 0;
   elements.mostActiveFrameImage.removeAttribute("src");
   elements.maskedFrameImage.removeAttribute("src");
   elements.gradcamFrameImage.removeAttribute("src");
+  console.error("Analysis error:", message);
 }
 
 async function analyzeVideo(file) {
@@ -145,12 +172,29 @@ function closeFullscreenImage() {
   overlay.style.display = "none";
 }
 
+function openCameraRecordOverlay() {
+  const overlay = document.getElementById("cameraRecordOverlay");
+  if (overlay) {
+    overlay.style.display = "flex";
+  }
+}
+
+function closeCameraRecordOverlay() {
+  const overlay = document.getElementById("cameraRecordOverlay");
+  if (overlay) {
+    overlay.style.display = "none";
+  }
+}
+
 function getCameraElements() {
   return {
     preview: document.getElementById("cameraPreview"),
     video: document.getElementById("cameraVideo"),
     overlay: document.getElementById("cameraOverlay"),
     status: document.getElementById("cameraStatus"),
+    recordVideo: document.getElementById("cameraRecordVideo"),
+    recordOverlay: document.getElementById("cameraRecordLayer"),
+    recordStatus: document.getElementById("cameraRecordStatus"),
     button: document.getElementById("cameraStartButton"),
   };
 }
@@ -161,15 +205,24 @@ function getCameraIdleText() {
 }
 
 function setCameraStatus(text) {
-  const { status } = getCameraElements();
-  status.innerText = text;
+  const { status, recordStatus } = getCameraElements();
+  if (status) {
+    status.innerText = text;
+  }
+  if (recordStatus) {
+    recordStatus.innerText = text;
+  }
 }
 
-function setCameraOverlay(text, isCountdown = false) {
-  const { overlay } = getCameraElements();
-  overlay.classList.remove("is-hidden");
-  overlay.classList.toggle("camera-overlay--countdown", isCountdown);
-  overlay.innerText = text;
+function setCameraOverlay(text, isCountdown = false, isRecording = false) {
+  const { overlay, recordOverlay } = getCameraElements();
+  [overlay, recordOverlay].forEach((target) => {
+    if (!target) return;
+    target.classList.remove("is-hidden");
+    target.classList.toggle("camera-overlay--countdown", isCountdown);
+    target.classList.toggle("camera-overlay--recording", isRecording);
+    target.innerText = text;
+  });
 }
 
 function setCameraBusy(isBusy) {
@@ -285,8 +338,9 @@ async function openCamera() {
     return;
   }
 
-  const { video } = getCameraElements();
+  const { video, recordVideo } = getCameraElements();
   setCameraBusy(true);
+  openCameraRecordOverlay();
 
   try {
     setCameraStatus("Requesting camera permission...");
@@ -295,13 +349,17 @@ async function openCamera() {
     const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
     activeCameraStream = stream;
 
-    video.srcObject = stream;
-    video.classList.remove("is-hidden");
-    await video.play();
+    if (video) {
+      video.classList.add("is-hidden");
+    }
+
+    recordVideo.srcObject = stream;
+    recordVideo.classList.remove("is-hidden");
+    await recordVideo.play();
 
     await runCameraCountdown(CAMERA_COUNTDOWN_SECONDS);
 
-    setCameraOverlay("REC", true);
+    setCameraOverlay("Recording", false, true);
     const mimeType = pickRecordingMimeType();
     const blob = await recordForDuration(
       stream,
@@ -319,6 +377,7 @@ async function openCamera() {
     const extension = extensionFromMimeType(outputType);
     const file = new File([blob], `camera_capture.${extension}`, { type: outputType });
 
+    closeCameraRecordOverlay();
     const wasSuccessful = await analyzeVideo(file);
     setCameraStatus(wasSuccessful ? "Scan complete." : "Analysis failed.");
     setCameraOverlay("Camera preview");
@@ -328,8 +387,15 @@ async function openCamera() {
     alert(err.message || "Camera access denied or recording failed.");
   } finally {
     stopCameraStream();
-    video.srcObject = null;
-    video.classList.add("is-hidden");
+    if (video) {
+      video.srcObject = null;
+      video.classList.add("is-hidden");
+    }
+    if (recordVideo) {
+      recordVideo.srcObject = null;
+      recordVideo.classList.add("is-hidden");
+    }
+    closeCameraRecordOverlay();
     setCameraBusy(false);
   }
 }
