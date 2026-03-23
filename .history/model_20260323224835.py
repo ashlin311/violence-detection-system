@@ -93,5 +93,5 @@ def run_inference(video_path):
         "most_active_frame": most_active_idx,
         "original_frame": original_frame,
         "masked_frame": masked_frame,
-        "person_count": person_counts[most_active_idx],
+        "person_count": person_count,
     }
