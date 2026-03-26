@@ -7,6 +7,7 @@ const CAMERA_RECORD_SECONDS = 8;
 
 let activeCameraStream = null;
 let isCameraBusy = false;
+let activeAnalysisVideoUrl = null;
 
 function openOverlay(id) {
   document.getElementById(id).style.display = "flex";
@@ -17,6 +18,7 @@ function closeOverlay() {
     overlay.style.display = "none";
     overlay.classList.remove("analysis-overlay--loading");
   });
+  pauseAnalysisVideo(true);
 }
 
 function openUpload() {
@@ -48,8 +50,66 @@ function getAnalysisElements() {
     mostActiveFrameImage: document.getElementById("mostActiveFrameImage"),
     maskedFrameImage: document.getElementById("maskedFrameImage"),
     gradcamFrameImage: document.getElementById("gradcamImage"),
+    analysisVideo: document.getElementById("analysisVideo"),
     gradcamSlider: document.getElementById("gradcamSlider"),
   };
+}
+
+function pauseAnalysisVideo(resetPosition = false) {
+  const { analysisVideo } = getAnalysisElements();
+  if (!analysisVideo) {
+    return;
+  }
+
+  analysisVideo.pause();
+  if (resetPosition) {
+    try {
+      analysisVideo.currentTime = 0;
+    } catch (err) {
+      // Ignore currentTime errors for empty media.
+    }
+  }
+}
+
+function clearAnalysisVideoSource() {
+  const { analysisVideo } = getAnalysisElements();
+  if (!analysisVideo) {
+    return;
+  }
+
+  pauseAnalysisVideo();
+  analysisVideo.removeAttribute("src");
+  analysisVideo.load();
+
+  if (activeAnalysisVideoUrl) {
+    URL.revokeObjectURL(activeAnalysisVideoUrl);
+    activeAnalysisVideoUrl = null;
+  }
+}
+
+function setAnalysisVideoSource(videoUrl) {
+  const { analysisVideo } = getAnalysisElements();
+  if (!analysisVideo) {
+    return;
+  }
+
+  if (!videoUrl) {
+    clearAnalysisVideoSource();
+    return;
+  }
+
+  if (activeAnalysisVideoUrl && activeAnalysisVideoUrl !== videoUrl) {
+    URL.revokeObjectURL(activeAnalysisVideoUrl);
+  }
+
+  activeAnalysisVideoUrl = videoUrl;
+  analysisVideo.src = videoUrl;
+  analysisVideo.load();
+
+  const playPromise = analysisVideo.play();
+  if (playPromise && typeof playPromise.catch === "function") {
+    playPromise.catch(() => {});
+  }
 }
 
 function showAnalysisLoading() {
@@ -58,9 +118,10 @@ function showAnalysisLoading() {
   elements.overlay.classList.add("analysis-overlay--loading");
   elements.loading.classList.remove("is-hidden");
   elements.result.classList.add("is-hidden");
+  pauseAnalysisVideo(true);
 }
 
-function showResult(data) {
+function showResult(data, analysisVideoUrl = "") {
   const elements = getAnalysisElements();
   elements.overlay.classList.remove("analysis-overlay--loading");
   elements.loading.classList.add("is-hidden");
@@ -91,6 +152,7 @@ function showResult(data) {
   } else {
     elements.gradcamFrameImage.removeAttribute("src");
   }
+  setAnalysisVideoSource(analysisVideoUrl);
 
   // Add click listeners to analysis frame images
   elements.mostActiveFrameImage.style.cursor = "pointer";
@@ -120,11 +182,13 @@ function showAnalysisError(message) {
   elements.mostActiveFrameImage.removeAttribute("src");
   elements.maskedFrameImage.removeAttribute("src");
   elements.gradcamFrameImage.removeAttribute("src");
+  clearAnalysisVideoSource();
   console.error("Analysis error:", message);
 }
 
 async function analyzeVideo(file) {
   showAnalysisLoading();
+  const localVideoUrl = URL.createObjectURL(file);
 
   const form = new FormData();
   form.append("video", file);
@@ -150,9 +214,10 @@ async function analyzeVideo(file) {
       throw new Error(payload.error || `Request failed with status ${res.status}`);
     }
 
-    showResult(payload);
+    showResult(payload, localVideoUrl);
     return true;
   } catch (err) {
+    URL.revokeObjectURL(localVideoUrl);
     showAnalysisError(err.message || "Backend connection error");
     return false;
   }
@@ -402,4 +467,7 @@ async function openCamera() {
 
 setCameraStatus(getCameraIdleText());
 
-window.addEventListener("beforeunload", stopCameraStream);
+window.addEventListener("beforeunload", () => {
+  stopCameraStream();
+  clearAnalysisVideoSource();
+});

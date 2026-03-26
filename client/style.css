@@ -649,11 +649,11 @@
 .modal-card {
   width: 100%;
   max-width: 1200px;
-  max-height: 78vh;
+  max-height: 84vh;
   border-radius: var(--border-radius);
   background-color: var(--bg-panel);
   box-sizing: border-box;
-  padding: 32px 30px;
+  padding: 34px 30px;
   text-align: center;
   overflow-y: auto;
 }
@@ -778,6 +778,37 @@
 
 .analysis-frame-block {
   text-align: left;
+  min-width: 0;
+}
+
+.analysis-bottom-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 2px;
+  align-items: start;
+}
+
+.analysis-gradcam-card {
+  min-width: 0;
+}
+
+.analysis-bottom-grid .analysis-frame-block {
+  display: flex;
+  flex-direction: column;
+}
+
+.analysis-bottom-grid .analysis-frame-label {
+  margin: 0 0 10px;
+}
+
+.analysis-bottom-grid .analysis-gradcam-head {
+  display: block;
+  margin: 0 0 10px;
+}
+
+.analysis-bottom-grid .analysis-gradcam-head .analysis-frame-label {
+  margin: 0;
 }
 
 .analysis-frame-label {
@@ -798,7 +829,8 @@
   border-radius: 14px;
   display: block;
   aspect-ratio: 16 / 9;
-  max-height: 240px;
+  height: 240px;
+  max-height: none;
   border: 1px solid rgba(116, 255, 206, 0.17);
   background: rgba(0, 0, 0, 0.24);
   object-fit: cover;
@@ -809,12 +841,23 @@
   opacity: 0;
 }
 
+.analysis-video-player {
+  background: #000;
+  height: 240px;
+  max-height: none;
+}
+
+.analysis-video-player:not([src]),
+.analysis-video-player[src=""] {
+  opacity: 0;
+}
+
 .analysis-gradcam-head {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(240px, 1.1fr);
   align-items: center;
   gap: 18px;
-  margin-top: 6px;
+  margin-top: 0;
 }
 
 .analysis-slider {
@@ -850,28 +893,38 @@
 
 .analysis-gradcam-block {
   margin-top: 12px;
-  border: 1px solid rgba(109, 240, 189, 0.16);
+  border: 1px solid rgba(116, 255, 206, 0.17);
   border-radius: 14px;
-  background:
-    radial-gradient(circle at 82% 40%, rgba(34, 118, 106, 0.24), transparent 56%),
-    rgba(3, 18, 19, 0.76);
-  min-height: 210px;
-  display: flex;
-  align-items: flex-end;
+  background: rgba(0, 0, 0, 0.24);
+  min-height: 0;
+  height: 240px;
+  display: block;
   position: relative;
-  padding: 10px;
+  padding: 0;
+  overflow: hidden;
+}
+
+.analysis-bottom-grid .analysis-gradcam-block {
+  margin-top: 0;
 }
 
 .analysis-frame--gradcam {
-  width: min(50%, 470px);
-  max-height: 190px;
+  width: 100%;
+  height: 100%;
+  max-height: none;
+  border: 0;
 }
 
 .analysis-index {
   position: absolute;
-  right: 18px;
-  bottom: 14px;
+  right: 12px;
+  bottom: 12px;
   margin: 0;
+  text-align: center;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: rgba(2, 11, 11, 0.7);
+  border: 1px solid rgba(130, 255, 205, 0.22);
   color: rgba(220, 242, 235, 0.88);
   font-size: clamp(16px, 1.2vw, 24px);
 }
@@ -1301,19 +1354,42 @@ animation:blink 1s infinite;
 }
 
 #analysis .analysis-frame {
+  height: 190px !important;
   max-height: 190px !important;
 }
 
 #analysis .analysis-gradcam-block {
-  min-height: 180px !important;
+  margin-top: 12px !important;
+  min-height: 0 !important;
+  height: 190px !important;
+  max-height: 190px !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+
+#analysis .analysis-bottom-grid .analysis-gradcam-head {
+  margin: 0 0 10px !important;
+}
+
+#analysis .analysis-bottom-grid .analysis-gradcam-block {
+  margin-top: 0 !important;
 }
 
 #analysis .analysis-frame--gradcam {
-  width: min(50%, 430px) !important;
-  max-height: 170px !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-height: none !important;
+  border: 0 !important;
+}
+
+#analysis .analysis-video-player {
+  height: 190px !important;
+  max-height: 190px !important;
 }
 
 #analysis .analysis-index {
+  right: 10px !important;
+  bottom: 10px !important;
   font-size: clamp(14px, 1vw, 22px) !important;
 }
 
@@ -1400,14 +1476,26 @@ animation:blink 1s infinite;
     grid-template-columns: 1fr !important;
   }
 
+  #analysis .analysis-bottom-grid {
+    grid-template-columns: 1fr !important;
+  }
+
   #analysis .analysis-gradcam-head {
     grid-template-columns: 1fr !important;
     gap: 8px !important;
   }
 
+  #analysis .analysis-frame,
+  #analysis .analysis-video-player,
+  #analysis .analysis-gradcam-block {
+    height: 150px !important;
+    max-height: 150px !important;
+  }
+
   #analysis .analysis-frame--gradcam {
     width: 100% !important;
-    max-height: 150px !important;
+    height: 100% !important;
+    max-height: none !important;
   }
 }
 .analysis-slider {

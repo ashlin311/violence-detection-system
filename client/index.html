@@ -119,14 +119,23 @@
               </div>
             </div>
 
-            <div class="analysis-gradcam-head">
-              <p class="analysis-frame-label analysis-frame-label--gradcam">Grad-CAM Visualization</p>
-              <input class="analysis-slider" id="gradcamSlider" type="range" min="0" max="100" value="82" disabled>
-            </div>
+            <div class="analysis-bottom-grid">
+              <div class="analysis-frame-block analysis-gradcam-card">
+                <div class="analysis-gradcam-head">
+                  <p class="analysis-frame-label analysis-frame-label--gradcam">Grad-CAM Visualization</p>
+                  <input class="analysis-slider" id="gradcamSlider" type="range" min="0" max="100" value="82" disabled>
+                </div>
 
-            <div class="analysis-gradcam-block">
-              <img class="analysis-frame analysis-frame--gradcam" id="gradcamImage" alt="Grad-CAM visualization of the most active frame">
-              <p class="analysis-index">Index: <span id="mostActiveFrame">-</span></p>
+                <div class="analysis-gradcam-block">
+                  <img class="analysis-frame analysis-frame--gradcam" id="gradcamImage" alt="Grad-CAM visualization of the most active frame">
+                  <p class="analysis-index">Index: <span id="mostActiveFrame">-</span></p>
+                </div>
+              </div>
+
+              <div class="analysis-frame-block">
+                <p class="analysis-frame-label">Video</p>
+                <video class="analysis-frame analysis-video-player" id="analysisVideo" controls playsinline></video>
+              </div>
             </div>
           </section>
 
