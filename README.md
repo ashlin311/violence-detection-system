@@ -57,6 +57,8 @@ python -m http.server 5500
 ```
 - Opens at `http://localhost:5500`
 
+For Vercel, the frontend will automatically use `https://violence-detection-backend.onrender.com` when it is not running on localhost. If you rename the Render service, update the fallback URL in `client/app.js`.
+
 ### Using the Application
 
 1. **Upload Video**

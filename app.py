@@ -96,4 +96,5 @@ def predict():
 if __name__ == '__main__':
     # Use 5001 by default to avoid collisions with local tooling on 5000.
     port = int(os.getenv("PORT", "5001"))
-    app.run(host='0.0.0.0', port=port, debug=True)
+    debug_mode = os.getenv("FLASK_DEBUG", "0") == "1"
+    app.run(host='0.0.0.0', port=port, debug=debug_mode)

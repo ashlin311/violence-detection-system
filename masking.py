@@ -1,7 +1,10 @@
+from pathlib import Path
+
 import numpy as np
 from ultralytics import YOLO
 
-yolo_model = YOLO("yolov8n.pt")
+BASE_DIR = Path(__file__).resolve().parent
+yolo_model = YOLO(str(BASE_DIR / "yolov8n.pt"))
 
 
 def apply_human_mask(frame,dim_factor=0.3):

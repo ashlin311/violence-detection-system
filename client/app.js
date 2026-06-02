@@ -1,6 +1,10 @@
-const API_BASE_URL = window.location.hostname
-  ? `${window.location.protocol}//${window.location.hostname}:5001`
-  : "http://127.0.0.1:5001";
+const isLocalhost = ["localhost", "127.0.0.1"].includes(window.location.hostname);
+const API_BASE_URL =
+  window.API_BASE_URL ||
+  window.__API_BASE_URL__ ||
+  (isLocalhost
+    ? "http://127.0.0.1:5001"
+    : "https://violence-detection-backend.onrender.com");
 
 const CAMERA_COUNTDOWN_SECONDS = 3;
 const CAMERA_RECORD_SECONDS = 8;

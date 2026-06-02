@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import torch
 import torch.nn as nn
 from torchvision import models, transforms
@@ -26,7 +28,10 @@ class TSNModel(nn.Module):
 # Load model
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model = TSNModel(num_classes=2, pretrained=False)
-model.load_state_dict(torch.load("model/tsn_masked_best.pth", map_location=device))
+BASE_DIR = Path(__file__).resolve().parent
+MODEL_PATH = BASE_DIR / "model" / "tsn_masked_best.pth"
+
+model.load_state_dict(torch.load(MODEL_PATH, map_location=device))
 model.to(device)
 model.eval()
 
